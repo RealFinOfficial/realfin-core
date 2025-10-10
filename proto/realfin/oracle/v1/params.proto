@@ -1,0 +1,13 @@
+syntax = "proto3";
+package realfin.oracle.v1;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "realfin/x/oracle/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "realfin/x/oracle/Params";
+  option (gogoproto.equal) = true;
+}

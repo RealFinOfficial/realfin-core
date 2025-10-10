@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package realfin.realestate.v1;
+
+import "amino/amino.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "realfin/realestate/v1/params.proto";
+import "realfin/realestate/v1/rate.proto";
+
+option go_package = "realfin/x/realestate/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/realfin/realestate/v1/params";
+  }
+
+  // ListRate Queries a list of Rate items.
+  rpc GetRate(QueryGetRateRequest) returns (QueryGetRateResponse) {
+    option (google.api.http).get = "/realfin/realestate/v1/rate/{symbol}";
+  }
+
+  // ListRate defines the ListRate RPC.
+  rpc ListRate(QueryAllRateRequest) returns (QueryAllRateResponse) {
+    option (google.api.http).get = "/realfin/realestate/v1/rate";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// QueryGetRateRequest defines the QueryGetRateRequest message.
+message QueryGetRateRequest {
+  string symbol = 1;
+}
+
+// QueryGetRateResponse defines the QueryGetRateResponse message.
+message QueryGetRateResponse {
+  Rate rate = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllRateRequest defines the QueryAllRateRequest message.
+message QueryAllRateRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllRateResponse defines the QueryAllRateResponse message.
+message QueryAllRateResponse {
+  repeated Rate rate = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

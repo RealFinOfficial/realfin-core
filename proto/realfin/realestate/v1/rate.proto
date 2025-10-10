@@ -1,0 +1,13 @@
+syntax = "proto3";
+package realfin.realestate.v1;
+
+option go_package = "realfin/x/realestate/types";
+
+// Rate defines the Rate message.
+message Rate {
+  string symbol = 1;
+  uint64 rate = 2;
+  string name = 3;
+  string description = 4;
+  string creator = 5;
+}

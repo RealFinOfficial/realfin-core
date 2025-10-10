@@ -1,0 +1,13 @@
+syntax = "proto3";
+package realfin.realestate.v1;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "realfin/x/realestate/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "realfin/x/realestate/Params";
+  option (gogoproto.equal) = true;
+}

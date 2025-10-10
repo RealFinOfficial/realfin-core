@@ -1,0 +1,13 @@
+syntax = "proto3";
+package realfin.oracle.v1;
+
+option go_package = "realfin/x/oracle/types";
+
+// Price defines the Price message.
+message Price {
+  string symbol = 1;
+  uint64 rate = 2;
+  string name = 3;
+  string description = 4;
+  string creator = 5;
+}

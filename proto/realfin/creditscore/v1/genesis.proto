@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package realfin.creditscore.v1;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "realfin/creditscore/v1/params.proto";
+import "realfin/creditscore/v1/rate.proto";
+
+option go_package = "realfin/x/creditscore/types";
+
+// GenesisState defines the creditscore module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  repeated Rate rate_map = 2 [(gogoproto.nullable) = false];
+}
