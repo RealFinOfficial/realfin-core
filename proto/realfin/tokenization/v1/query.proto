@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package realfin.tokenization.v1;
+
+import "amino/amino.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "realfin/tokenization/v1/params.proto";
+import "realfin/tokenization/v1/asset.proto";
+
+option go_package = "realfin/x/tokenization/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/realfin/tokenization/v1/params";
+  }
+
+  // GetAsset Queries a single Asset item.
+  rpc GetAsset(QueryGetAssetRequest) returns (QueryGetAssetResponse) {
+    option (google.api.http).get = "/realfin/tokenization/v1/asset/{symbol}";
+  }
+
+  // ListAsset defines the ListAsset RPC.
+  rpc ListAsset(QueryAllAssetRequest) returns (QueryAllAssetResponse) {
+    option (google.api.http).get = "/realfin/tokenization/v1/asset";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// QueryGetAssetRequest defines the QueryGetAssetRequest message.
+message QueryGetAssetRequest {
+  string symbol = 1;
+}
+
+// QueryGetAssetResponse defines the QueryGetAssetResponse message.
+message QueryGetAssetResponse {
+  Asset asset = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllAssetRequest defines the QueryAllAssetRequest message.
+message QueryAllAssetRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllAssetResponse defines the QueryAllAssetResponse message.
+message QueryAllAssetResponse {
+  repeated Asset asset = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

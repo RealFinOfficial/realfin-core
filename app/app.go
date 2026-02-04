@@ -50,6 +50,7 @@ import (
 	oraclemodulekeeper "realfin/x/oracle/keeper"
 	realestatemodulekeeper "realfin/x/realestate/keeper"
 	realfinmodulekeeper "realfin/x/realfin/keeper"
+	tokenizationmodulekeeper "realfin/x/tokenization/keeper"
 )
 
 const (
@@ -106,7 +107,8 @@ type App struct {
 	RealfinKeeper     realfinmodulekeeper.Keeper
 	OracleKeeper      oraclemodulekeeper.Keeper
 	CreditscoreKeeper creditscoremodulekeeper.Keeper
-	RealestateKeeper  realestatemodulekeeper.Keeper
+	RealestateKeeper     realestatemodulekeeper.Keeper
+	TokenizationKeeper   tokenizationmodulekeeper.Keeper
 }
 
 func init() {
@@ -183,6 +185,7 @@ func New(
 		&app.OracleKeeper,
 		&app.CreditscoreKeeper,
 		&app.RealestateKeeper,
+		&app.TokenizationKeeper,
 	); err != nil {
 		panic(err)
 	}

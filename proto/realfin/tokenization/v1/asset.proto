@@ -1,0 +1,14 @@
+syntax = "proto3";
+package realfin.tokenization.v1;
+
+option go_package = "realfin/x/tokenization/types";
+
+// Asset defines the Asset message.
+message Asset {
+  string symbol = 1;
+  string name = 2;
+  string description = 3;
+  string asset_type = 4;
+  string metadata = 5;
+  string creator = 6;
+}
