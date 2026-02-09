@@ -8,7 +8,7 @@ Layer 1 blockchain for real-world asset (RWA) tokenization, built with Cosmos SD
 
 Realfin is a purpose-built Layer 1 blockchain designed to empower small and medium enterprises (SMEs) through the tokenization of real-world assets (RWAs). Built with decentralization at its core, Realfin streamlines the process of tokenization, enabling businesses to unlock liquidity, access global markets, and participate in the future of finance.
 
-The platform extends the Cosmos SDK with five custom modules that provide on-chain data infrastructure for price feeds, credit ratings, real estate valuations, and real-world asset tokenization. These modules serve as the foundation for asset classification, risk assessment, valuation, and tokenization within the Realfin ecosystem.
+The platform extends the Cosmos SDK with six custom modules that provide on-chain data infrastructure for price feeds, credit ratings, real estate valuations, real-world asset tokenization, and embedded insurance policies. These modules serve as the foundation for asset classification, risk assessment, valuation, tokenization, and insurance coverage within the Realfin ecosystem.
 
 As a sovereign L1 chain, Realfin operates independently using CometBFT (Tendermint) Proof-of-Stake consensus, providing fast transaction finality, high throughput, and energy efficiency. Its modular design grants full sovereignty over protocol rules and customization capabilities tailored to RWA compliance requirements.
 
@@ -16,7 +16,7 @@ Key characteristics:
 
 - **Sovereign L1 chain** with CometBFT (Tendermint) Proof-of-Stake consensus
 - **IBC-enabled** for cross-chain interoperability — supports interchain transfers and interchain accounts, connecting Realfin to the broader Cosmos ecosystem
-- **Five custom modules**: `oracle` (price data), `creditscore` (credit ratings), `realestate` (real estate valuations), `tokenization` (real-world asset tokenization), `realfin` (base module with governance parameters)
+- **Six custom modules**: `oracle` (price data), `creditscore` (credit ratings), `realestate` (real estate valuations), `tokenization` (real-world asset tokenization), `insurance` (embedded insurance policies), `realfin` (base module with governance parameters)
 - **Binary**: `realfind` — the node daemon and CLI client
 - **Default denomination**: `urlf`
 - **Address prefix**: `cosmos` (coin type 118)
@@ -48,12 +48,14 @@ realfin-core/
 │   ├── creditscore/v1/     # Credit rating proto definitions
 │   ├── realestate/v1/      # Real estate rating proto definitions
 │   ├── tokenization/v1/    # Asset tokenization proto definitions
+│   ├── insurance/v1/       # Insurance policy proto definitions
 │   └── realfin/v1/         # Base module proto definitions
 ├── x/                      # Custom modules implementation
 │   ├── oracle/             # Price data module
 │   ├── creditscore/        # Credit rating module
 │   ├── realestate/         # Real estate rating module
 │   ├── tokenization/       # Asset tokenization module
+│   ├── insurance/          # Insurance policy module
 │   └── realfin/            # Base module (params only)
 ├── docs/static/            # OpenAPI/Swagger specification
 ├── config.yml              # Development chain configuration
@@ -75,11 +77,11 @@ x/<module>/
 └── simulation/     # Simulation test helpers for fuzz testing
 ```
 
-The modules `oracle`, `creditscore`, `realestate`, and `tokenization` are structurally identical — each manages a single `collections.Map` collection keyed by `symbol` (string). The `realfin` module is the base module and contains only governance-controlled `Params` (no data map).
+The modules `oracle`, `creditscore`, `realestate`, `tokenization`, and `insurance` are structurally identical — each manages a single `collections.Map` collection keyed by `symbol` or `policy_id` (string). The `realfin` module is the base module and contains only governance-controlled `Params` (no data map).
 
 ### Standard Cosmos Modules
 
-In addition to the five custom modules, Realfin includes the full suite of standard Cosmos SDK modules. These provide the foundational blockchain functionality — account management, token transfers, staking, governance, and more. All modules are registered via depinject in `app/app_config.go`:
+In addition to the six custom modules, Realfin includes the full suite of standard Cosmos SDK modules. These provide the foundational blockchain functionality — account management, token transfers, staking, governance, and more. All modules are registered via depinject in `app/app_config.go`:
 
 `auth`, `authz`, `bank`, `consensus`, `distribution`, `epochs`, `evidence`, `feegrant`, `genutil`, `gov`, `group`, `mint`, `nft`, `params`, `slashing`, `staking`, `upgrade`, `circuit`, `vesting`
 
@@ -90,11 +92,11 @@ The Cosmos SDK processes module logic at specific points in the block lifecycle.
 | Phase | Purpose | Modules (in order) |
 |---|---|---|
 | **PreBlockers** | Critical operations before block processing | `upgrade`, `auth` |
-| **BeginBlockers** | Start-of-block logic (inflation, slashing, etc.) | `mint` → `distribution` → `slashing` → `evidence` → `staking` → `authz` → `epochs` → `ibc` → `realfin` → `oracle` → `creditscore` → `realestate` → `tokenization` |
-| **EndBlockers** | End-of-block logic (governance tallying, etc.) | `gov` → `staking` → `feegrant` → `group` → `realfin` → `oracle` → `creditscore` → `realestate` → `tokenization` |
-| **InitGenesis** | One-time initialization from genesis state | `consensus` → `auth` → `bank` → `distribution` → `staking` → `slashing` → `gov` → `mint` → `genutil` → `evidence` → `authz` → `feegrant` → `vesting` → `nft` → `group` → `upgrade` → `circuit` → `epochs` → `ibc` → `transfer` → `interchainaccounts` → `realfin` → `oracle` → `creditscore` → `realestate` → `tokenization` |
+| **BeginBlockers** | Start-of-block logic (inflation, slashing, etc.) | `mint` → `distribution` → `slashing` → `evidence` → `staking` → `authz` → `epochs` → `ibc` → `realfin` → `oracle` → `creditscore` → `realestate` → `tokenization` → `insurance` |
+| **EndBlockers** | End-of-block logic (governance tallying, etc.) | `gov` → `staking` → `feegrant` → `group` → `realfin` → `oracle` → `creditscore` → `realestate` → `tokenization` → `insurance` |
+| **InitGenesis** | One-time initialization from genesis state | `consensus` → `auth` → `bank` → `distribution` → `staking` → `slashing` → `gov` → `mint` → `genutil` → `evidence` → `authz` → `feegrant` → `vesting` → `nft` → `group` → `upgrade` → `circuit` → `epochs` → `ibc` → `transfer` → `interchainaccounts` → `realfin` → `oracle` → `creditscore` → `realestate` → `tokenization` → `insurance` |
 
-The custom modules (`realfin`, `oracle`, `creditscore`, `realestate`, `tokenization`) are always positioned after all standard Cosmos modules, ensuring that the core blockchain infrastructure is fully initialized before custom logic executes.
+The custom modules (`realfin`, `oracle`, `creditscore`, `realestate`, `tokenization`, `insurance`) are always positioned after all standard Cosmos modules, ensuring that the core blockchain infrastructure is fully initialized before custom logic executes.
 
 ### Keeper Model
 
@@ -108,7 +110,7 @@ The keeper is the central component of each module, responsible for reading from
 State is managed via `cosmossdk.io/collections`, a type-safe abstraction over raw KV store operations:
 
 - `Params` — `collections.Item` stores a single parameters object for each module
-- `Price` / `Rate` / `Asset` — `collections.Map[string, Type]` stores data entries keyed by a string symbol, supporting efficient lookup, iteration, and pagination
+- `Price` / `Rate` / `Asset` / `Policy` — `collections.Map[string, Type]` stores data entries keyed by a string symbol or policy ID, supporting efficient lookup, iteration, and pagination
 
 ### depinject Wiring
 
@@ -278,7 +280,7 @@ This modifies both application and consensus stores to remove the old validator 
 
 ## Custom Modules
 
-Realfin extends the Cosmos SDK with five custom modules that provide on-chain data infrastructure. Four of these modules (`oracle`, `creditscore`, `realestate`, `tokenization`) follow an identical CRUD pattern for managing data entries, while the fifth (`realfin`) serves as the base module with governance-controlled parameters.
+Realfin extends the Cosmos SDK with six custom modules that provide on-chain data infrastructure. Five of these modules (`oracle`, `creditscore`, `realestate`, `tokenization`, `insurance`) follow an identical CRUD pattern for managing data entries, while the sixth (`realfin`) serves as the base module with governance-controlled parameters.
 
 Each data module stores its entries in a `collections.Map` keyed by a string symbol. All entries include a `creator` field that tracks the address which originally created the record, enabling ownership-based access control for updates and deletions.
 
@@ -549,6 +551,77 @@ realfind tx tokenization delete-asset RWA-SF-101 --from alice
 
 ---
 
+### Insurance (`x/insurance`) — Insurance Policies
+
+The insurance module provides on-chain storage for insurance policies linked to tokenized real-world assets. Insurance providers can register coverage details against any tokenized asset, creating a transparent and auditable record of which assets are insured, by whom, and to what extent. This module is a foundational building block for asset grading and risk assessment on the Realfin platform, enabling the creation of insured and non-insured asset tranches.
+
+Like the tokenization module, insurance uses only string fields, making it suitable for flexible metadata about coverage terms and provider information.
+
+**Entity: Policy**
+
+| Field | Type | Description |
+|---|---|---|
+| `policy_id` | `string` | Unique identifier for the insurance policy (e.g., `POL-001`, `INS-RWA-101`). Used as the map key — must be unique across all entries in this module. |
+| `asset_symbol` | `string` | The symbol of the tokenized asset being insured (e.g., `RWA-SF-101`). This is a reference to an entry in the tokenization module, though it is not enforced at the protocol level. |
+| `provider` | `string` | Name of the insurance company or underwriter providing the coverage. |
+| `coverage_type` | `string` | Classification of the coverage. Recommended values: `full`, `partial` — but the field is free-form and application-defined. |
+| `coverage_percentage` | `string` | The percentage of asset value covered by this policy (e.g., `100`, `75`). Stored as a string to allow flexible formatting. |
+| `creator` | `string` | The bech32-encoded address of the account that registered this policy. This address is the owner — only the creator can update or delete the entry. |
+
+**Transaction Commands:**
+
+```bash
+# Create a new insurance policy. The policy_id must not already exist.
+# All five positional arguments are required.
+realfind tx insurance create-policy [policy_id] [asset_symbol] [provider] [coverage_type] [coverage_percentage] --from <key>
+
+# Update an existing insurance policy. The policy_id must exist, and the --from address
+# must match the original creator. All fields are overwritten.
+realfind tx insurance update-policy [policy_id] [asset_symbol] [provider] [coverage_type] [coverage_percentage] --from <key>
+
+# Delete an insurance policy. The policy_id must exist, and the --from address
+# must match the original creator.
+realfind tx insurance delete-policy [policy_id] --from <key>
+```
+
+**Query Commands:**
+
+```bash
+# Retrieve a single policy by its policy_id.
+# Aliases: get-policy, show-policy
+realfind q insurance get-policy [policy_id]
+
+# List all policies with pagination support.
+# Supports standard Cosmos pagination flags: --limit, --offset, --count-total
+realfind q insurance list-policy
+
+# Show the insurance module's current parameters.
+realfind q insurance params
+```
+
+**Example usage:**
+
+```bash
+# Create an insurance policy for a tokenized property
+realfind tx insurance create-policy POL-001 RWA-SF-101 "AIG Insurance" full 100 --from alice
+
+# Query the policy
+realfind q insurance get-policy POL-001
+
+# Update the coverage terms
+realfind tx insurance update-policy POL-001 RWA-SF-101 "AIG Global" full 95 --from alice
+
+# List all policies
+realfind q insurance list-policy
+
+# Remove the policy
+realfind tx insurance delete-policy POL-001 --from alice
+```
+
+**Access control:** Only the original creator (the address that submitted the `create-policy` transaction) can update or delete a policy entry. Attempting to modify another user's entry returns an `ErrUnauthorized` error.
+
+---
+
 ### Realfin (`x/realfin`) — Base Module
 
 The realfin module is the base module of the chain. Unlike the four data modules above, it does not manage any data map — it exists solely to hold governance-controlled module parameters.
@@ -564,7 +637,7 @@ The `UpdateParams` message is restricted to the `x/gov` module authority address
 
 ### CRUD Operation Pattern
 
-All four data modules (oracle, creditscore, realestate, tokenization) implement identical handler logic for their Create, Update, and Delete operations. This consistency simplifies development and ensures predictable behavior across the entire data layer:
+All five data modules (oracle, creditscore, realestate, tokenization, insurance) implement identical handler logic for their Create, Update, and Delete operations. This consistency simplifies development and ensures predictable behavior across the entire data layer:
 
 | Operation | Handler Logic |
 |---|---|
@@ -620,6 +693,7 @@ realfind q <module> <command> [args] [flags]
 | `creditscore` | `create-rate`, `update-rate`, `delete-rate` | `get-rate` (alias: `show-rate`), `list-rate`, `params` |
 | `realestate` | `create-rate`, `update-rate`, `delete-rate` | `get-rate` (alias: `show-rate`), `list-rate`, `params` |
 | `tokenization` | `create-asset`, `update-asset`, `delete-asset` | `get-asset` (alias: `show-asset`), `list-asset`, `params` |
+| `insurance` | `create-policy`, `update-policy`, `delete-policy` | `get-policy` (alias: `show-policy`), `list-policy`, `params` |
 | `realfin` | — | `params` |
 
 ### Standard Node Commands
@@ -702,6 +776,14 @@ All REST endpoints use the GET method and return JSON responses. The base URL de
 | `/realfin/tokenization/v1/asset/{symbol}` | Returns a single tokenized asset entry by its symbol. |
 | `/realfin/tokenization/v1/asset` | Returns all tokenized asset entries with pagination support. |
 
+**Insurance module:**
+
+| Endpoint | Description |
+|---|---|
+| `/realfin/insurance/v1/params` | Returns the insurance module's current parameters. |
+| `/realfin/insurance/v1/policy/{policy_id}` | Returns a single insurance policy by its policy ID. |
+| `/realfin/insurance/v1/policy` | Returns all insurance policies with pagination support. |
+
 **Realfin base module:**
 
 | Endpoint | Description |
@@ -718,6 +800,7 @@ Each module exposes both a `Query` and a `Msg` service via gRPC. The `Query` ser
 | Creditscore | `realfin.creditscore.v1.Query` | `realfin.creditscore.v1.Msg` |
 | Realestate | `realfin.realestate.v1.Query` | `realfin.realestate.v1.Msg` |
 | Tokenization | `realfin.tokenization.v1.Query` | `realfin.tokenization.v1.Msg` |
+| Insurance | `realfin.insurance.v1.Query` | `realfin.insurance.v1.Msg` |
 | Realfin | `realfin.realfin.v1.Query` | `realfin.realfin.v1.Msg` |
 
 The default gRPC port is `9090`. You can use any gRPC client (e.g., `grpcurl`) to interact with these services directly.
@@ -754,9 +837,9 @@ Two light client types are registered for verifying the state of connected chain
 
 Realfin inherits the full Cosmos SDK governance framework, which allows token holders to propose and vote on protocol changes. Within the custom modules, governance plays a specific role in parameter management.
 
-Module parameters for all five custom modules (`realfin`, `oracle`, `creditscore`, `realestate`, `tokenization`) are updated exclusively through governance proposals. The `UpdateParams` message in each module requires the sender to match the `x/gov` module authority address — any other sender is rejected with `ErrUnauthorized`.
+Module parameters for all six custom modules (`realfin`, `oracle`, `creditscore`, `realestate`, `tokenization`, `insurance`) are updated exclusively through governance proposals. The `UpdateParams` message in each module requires the sender to match the `x/gov` module authority address — any other sender is rejected with `ErrUnauthorized`.
 
-The `UpdateParams` CLI command is intentionally hidden from AutoCLI (`Skip: true` in all five modules). This is a deliberate design choice: parameter changes affect the entire network and should go through the standard governance process (submit proposal → deposit period → voting period → execution), rather than being callable directly from the CLI.
+The `UpdateParams` CLI command is intentionally hidden from AutoCLI (`Skip: true` in all six modules). This is a deliberate design choice: parameter changes affect the entire network and should go through the standard governance process (submit proposal → deposit period → voting period → execution), rather than being callable directly from the CLI.
 
 The governance flow for updating module parameters:
 
