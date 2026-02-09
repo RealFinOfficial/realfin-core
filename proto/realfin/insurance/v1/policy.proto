@@ -1,0 +1,14 @@
+syntax = "proto3";
+package realfin.insurance.v1;
+
+option go_package = "realfin/x/insurance/types";
+
+// Policy defines the Policy message.
+message Policy {
+  string policy_id = 1;
+  string asset_symbol = 2;
+  string provider = 3;
+  string coverage_type = 4;
+  string coverage_percentage = 5;
+  string creator = 6;
+}

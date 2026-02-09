@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package realfin.insurance.v1;
+
+import "amino/amino.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "realfin/insurance/v1/params.proto";
+import "realfin/insurance/v1/policy.proto";
+
+option go_package = "realfin/x/insurance/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/realfin/insurance/v1/params";
+  }
+
+  // GetPolicy Queries a single Policy item.
+  rpc GetPolicy(QueryGetPolicyRequest) returns (QueryGetPolicyResponse) {
+    option (google.api.http).get = "/realfin/insurance/v1/policy/{policy_id}";
+  }
+
+  // ListPolicy defines the ListPolicy RPC.
+  rpc ListPolicy(QueryAllPolicyRequest) returns (QueryAllPolicyResponse) {
+    option (google.api.http).get = "/realfin/insurance/v1/policy";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// QueryGetPolicyRequest defines the QueryGetPolicyRequest message.
+message QueryGetPolicyRequest {
+  string policy_id = 1;
+}
+
+// QueryGetPolicyResponse defines the QueryGetPolicyResponse message.
+message QueryGetPolicyResponse {
+  Policy policy = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllPolicyRequest defines the QueryAllPolicyRequest message.
+message QueryAllPolicyRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllPolicyResponse defines the QueryAllPolicyResponse message.
+message QueryAllPolicyResponse {
+  repeated Policy policy = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

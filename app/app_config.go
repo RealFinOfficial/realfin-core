@@ -10,6 +10,8 @@ import (
 	_ "realfin/x/realfin/module"
 	_ "realfin/x/tokenization/module"
 	tokenizationmoduletypes "realfin/x/tokenization/types"
+	_ "realfin/x/insurance/module"
+	insurancemoduletypes "realfin/x/insurance/types"
 	realfinmoduletypes "realfin/x/realfin/types"
 	"time"
 
@@ -138,6 +140,7 @@ var (
 						creditscoremoduletypes.ModuleName,
 						realestatemoduletypes.ModuleName,
 						tokenizationmoduletypes.ModuleName,
+						insurancemoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/beginBlockers
 					},
 					EndBlockers: []string{
@@ -151,6 +154,7 @@ var (
 						creditscoremoduletypes.ModuleName,
 						realestatemoduletypes.ModuleName,
 						tokenizationmoduletypes.ModuleName,
+						insurancemoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/endBlockers
 					},
 					// The following is mostly only needed when ModuleName != StoreKey name.
@@ -192,6 +196,7 @@ var (
 						creditscoremoduletypes.ModuleName,
 						realestatemoduletypes.ModuleName,
 						tokenizationmoduletypes.ModuleName,
+						insurancemoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/initGenesis
 					},
 				}),
@@ -307,6 +312,10 @@ var (
 			{
 				Name:   tokenizationmoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&tokenizationmoduletypes.Module{}),
+			},
+			{
+				Name:   insurancemoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&insurancemoduletypes.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},

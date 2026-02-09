@@ -51,6 +51,7 @@ import (
 	realestatemodulekeeper "realfin/x/realestate/keeper"
 	realfinmodulekeeper "realfin/x/realfin/keeper"
 	tokenizationmodulekeeper "realfin/x/tokenization/keeper"
+	insurancemodulekeeper "realfin/x/insurance/keeper"
 )
 
 const (
@@ -109,6 +110,7 @@ type App struct {
 	CreditscoreKeeper creditscoremodulekeeper.Keeper
 	RealestateKeeper     realestatemodulekeeper.Keeper
 	TokenizationKeeper   tokenizationmodulekeeper.Keeper
+	InsuranceKeeper      insurancemodulekeeper.Keeper
 }
 
 func init() {
@@ -186,6 +188,7 @@ func New(
 		&app.CreditscoreKeeper,
 		&app.RealestateKeeper,
 		&app.TokenizationKeeper,
+		&app.InsuranceKeeper,
 	); err != nil {
 		panic(err)
 	}
